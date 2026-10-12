@@ -1,16 +1,15 @@
 package br.com.fiap.nous_sight.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.fiap.nous_sight.domain.TermCategory;
 import br.com.fiap.nous_sight.dto.MeetingSummaryDTO;
 import br.com.fiap.nous_sight.entity.GeneratedAlert;
-import br.com.fiap.nous_sight.entity.Meeting;
 import br.com.fiap.nous_sight.entity.TranscriptLine;
 import br.com.fiap.nous_sight.repository.GeneratedAlertRepository;
 import br.com.fiap.nous_sight.repository.TranscriptLineRepository;
@@ -18,55 +17,55 @@ import br.com.fiap.nous_sight.repository.TranscriptLineRepository;
 @Service
 public class ClientHistoryService {
 
-    private static final int CHURN_RISK_WINDOW_DAYS = 30;
-
     private final GeneratedAlertRepository alertRepository;
     private final TranscriptLineRepository transcriptLineRepository;
     private final AlertService alertService;
+    private final MeetingService meetingService;
 
     public ClientHistoryService(GeneratedAlertRepository alertRepository,
-                                 TranscriptLineRepository transcriptLineRepository,
-                                 AlertService alertService) {
+                                TranscriptLineRepository transcriptLineRepository,
+                                AlertService alertService,
+                                MeetingService meetingService) {
         this.alertRepository = alertRepository;
         this.transcriptLineRepository = transcriptLineRepository;
         this.alertService = alertService;
+        this.meetingService = meetingService;
     }
 
-    public String calculateChurnRisk(Meeting meeting) {
-        LocalDateTime windowStart = LocalDateTime.now().minusDays(CHURN_RISK_WINDOW_DAYS);
+    // 4.4 - competitor mentions in the meeting: 0-1 Low, 2-3 Medium, 4+ High (computed, not stored)
+    @Transactional(readOnly = true)
+    public String calculateChurnRisk(Long meetingId) {
+        meetingService.findById(meetingId);
+        long competitorMentions = alertRepository
+                .countByTranscriptLine_Meeting_IdAndTerm_Category(meetingId, TermCategory.COMPETITOR);
 
-        long rivalMentionCount = alertRepository
-                .findByTerm_CategoryAndTranscriptLine_Meeting(TermCategory.COMPETITOR, meeting)
-                .stream()
-                .filter(alert -> alert.getTranscriptLine().getSpokenAt().isAfter(windowStart))
-                .count();
-
-        if (rivalMentionCount <= 1) {
+        if (competitorMentions <= 1) {
             return "Low";
         }
-        if (rivalMentionCount <= 3) {
+        if (competitorMentions <= 3) {
             return "Medium";
         }
         return "High";
     }
 
+    // 4.5 - lines, alerts, average score and detected terms of a meeting
+    @Transactional(readOnly = true)
     public MeetingSummaryDTO generateMeetingSummary(Long meetingId) {
-        List<TranscriptLine> transcriptLines = transcriptLineRepository.findByMeeting_Id(meetingId);
+        meetingService.findById(meetingId);
+        List<TranscriptLine> transcriptLines = transcriptLineRepository.findByMeeting_IdOrderBySpokenAt(meetingId);
         List<GeneratedAlert> alerts = alertRepository.findByTranscriptLine_Meeting_Id(meetingId);
 
         Map<TermCategory, List<String>> termsByCategory = alerts.stream()
                 .collect(Collectors.groupingBy(
                         alert -> alert.getTerm().getCategory(),
-                        Collectors.mapping(alert -> alert.getTerm().getKeyword(), Collectors.toList())));
+                        Collectors.mapping(alert -> alert.getTerm().getKeyword(),
+                                Collectors.collectingAndThen(Collectors.toList(),
+                                        keywords -> keywords.stream().distinct().toList()))));
 
-        termsByCategory.replaceAll((category, keywords) ->
-                keywords.stream().distinct().collect(Collectors.toList()));
-
-        return MeetingSummaryDTO.builder()
-                .totalTranscriptLines(transcriptLines.size())
-                .totalAlerts(alerts.size())
-                .averageConfidenceScore(alertService.calculateAverageConfidenceScore(meetingId))
-                .termsByCategory(termsByCategory)
-                .build();
+        return new MeetingSummaryDTO(
+                transcriptLines.size(),
+                alerts.size(),
+                alertService.calculateAverageConfidenceScore(meetingId),
+                termsByCategory);
     }
 }

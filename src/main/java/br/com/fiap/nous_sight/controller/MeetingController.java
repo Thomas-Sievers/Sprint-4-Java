@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.nous_sight.dto.MeetingRequest;
 import br.com.fiap.nous_sight.entity.Meeting;
 import br.com.fiap.nous_sight.service.MeetingService;
 
@@ -27,29 +28,29 @@ public class MeetingController {
 
     @GetMapping
     public List<Meeting> list() {
-        return service.list();
+        return service.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> search(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(service.search(id));
+            return ResponseEntity.ok(service.findById(id));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody Meeting meeting) {
+    public ResponseEntity<?> post(@RequestBody MeetingRequest meeting) {
         try {
-            return ResponseEntity.ok(service.save(meeting));
+            return ResponseEntity.ok(service.create(meeting));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Meeting meeting) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody MeetingRequest meeting) {
         try {
             return ResponseEntity.ok(service.update(id, meeting));
         } catch (RuntimeException e) {

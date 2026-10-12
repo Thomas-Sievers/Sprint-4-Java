@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fiap.nous_sight.dto.AlertRequest;
 import br.com.fiap.nous_sight.dto.AlertValidationRequest;
 import br.com.fiap.nous_sight.entity.GeneratedAlert;
 import br.com.fiap.nous_sight.service.AlertService;
@@ -28,29 +29,29 @@ public class AlertController {
 
     @GetMapping
     public List<GeneratedAlert> list() {
-        return service.list();
+        return service.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> search(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(service.search(id));
+            return ResponseEntity.ok(service.findById(id));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody GeneratedAlert alert) {
+    public ResponseEntity<?> post(@RequestBody AlertRequest alert) {
         try {
-            return ResponseEntity.ok(service.save(alert));
+            return ResponseEntity.ok(service.create(alert));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody GeneratedAlert alert) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody AlertRequest alert) {
         try {
             return ResponseEntity.ok(service.update(id, alert));
         } catch (RuntimeException e) {
@@ -71,7 +72,7 @@ public class AlertController {
     @PostMapping("/{id}/validate")
     public ResponseEntity<?> validate(@PathVariable Long id, @RequestBody AlertValidationRequest request) {
         try {
-            GeneratedAlert alert = service.registerHumanValidation(id, request.isConfirmed(), request.getCorrectedNote());
+            GeneratedAlert alert = service.registerHumanValidation(id, request.confirmed(), request.correctedNote());
             return ResponseEntity.ok(alert);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

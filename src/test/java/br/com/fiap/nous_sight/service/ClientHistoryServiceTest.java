@@ -1,6 +1,7 @@
 package br.com.fiap.nous_sight.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import br.com.fiap.nous_sight.entity.DictionaryTerm;
 import br.com.fiap.nous_sight.entity.GeneratedAlert;
 import br.com.fiap.nous_sight.entity.Meeting;
 import br.com.fiap.nous_sight.entity.TranscriptLine;
+import br.com.fiap.nous_sight.exception.ResourceNotFoundException;
 import br.com.fiap.nous_sight.repository.GeneratedAlertRepository;
 import br.com.fiap.nous_sight.repository.TranscriptLineRepository;
 
@@ -33,87 +35,78 @@ class ClientHistoryServiceTest {
     @Mock
     private AlertService alertService;
 
+    @Mock
+    private MeetingService meetingService;
+
     private ClientHistoryService service;
 
     @BeforeEach
     void setUp() {
-        service = new ClientHistoryService(alertRepository, transcriptLineRepository, alertService);
+        service = new ClientHistoryService(alertRepository, transcriptLineRepository, alertService, meetingService);
     }
 
-    private GeneratedAlert rivalAlertSpokenAt(LocalDateTime spokenAt) {
-        TranscriptLine line = TranscriptLine.builder().spokenAt(spokenAt).build();
-        DictionaryTerm term = DictionaryTerm.builder().category(TermCategory.COMPETITOR).build();
-        return GeneratedAlert.builder().transcriptLine(line).term(term).build();
+    private void mockCompetitorMentions(long count) {
+        when(meetingService.findById(1L)).thenReturn(Meeting.builder().id(1L).build());
+        when(alertRepository.countByTranscriptLine_Meeting_IdAndTerm_Category(1L, TermCategory.COMPETITOR))
+                .thenReturn(count);
     }
 
     @Test
     void calculateChurnRisk_returnsLowForOneOrFewerMentions() {
-        Meeting meeting = Meeting.builder().id(1L).build();
-        List<GeneratedAlert> alerts = List.of(rivalAlertSpokenAt(LocalDateTime.now()));
-        when(alertRepository.findByTerm_CategoryAndTranscriptLine_Meeting(TermCategory.COMPETITOR, meeting)).thenReturn(alerts);
-
-        assertEquals("Low", service.calculateChurnRisk(meeting));
+        mockCompetitorMentions(1);
+        assertEquals("Low", service.calculateChurnRisk(1L));
     }
 
     @Test
     void calculateChurnRisk_returnsMediumForTwoOrThreeMentions() {
-        Meeting meeting = Meeting.builder().id(1L).build();
-        List<GeneratedAlert> alerts = List.of(
-                rivalAlertSpokenAt(LocalDateTime.now()),
-                rivalAlertSpokenAt(LocalDateTime.now()),
-                rivalAlertSpokenAt(LocalDateTime.now()));
-        when(alertRepository.findByTerm_CategoryAndTranscriptLine_Meeting(TermCategory.COMPETITOR, meeting)).thenReturn(alerts);
-
-        assertEquals("Medium", service.calculateChurnRisk(meeting));
+        mockCompetitorMentions(3);
+        assertEquals("Medium", service.calculateChurnRisk(1L));
     }
 
     @Test
     void calculateChurnRisk_returnsHighForFourOrMoreMentions() {
-        Meeting meeting = Meeting.builder().id(1L).build();
-        List<GeneratedAlert> alerts = List.of(
-                rivalAlertSpokenAt(LocalDateTime.now()),
-                rivalAlertSpokenAt(LocalDateTime.now()),
-                rivalAlertSpokenAt(LocalDateTime.now()),
-                rivalAlertSpokenAt(LocalDateTime.now()));
-        when(alertRepository.findByTerm_CategoryAndTranscriptLine_Meeting(TermCategory.COMPETITOR, meeting)).thenReturn(alerts);
-
-        assertEquals("High", service.calculateChurnRisk(meeting));
+        mockCompetitorMentions(4);
+        assertEquals("High", service.calculateChurnRisk(1L));
     }
 
     @Test
-    void calculateChurnRisk_ignoresMentionsOlderThan30Days() {
-        Meeting meeting = Meeting.builder().id(1L).build();
-        List<GeneratedAlert> alerts = List.of(
-                rivalAlertSpokenAt(LocalDateTime.now().minusDays(45)),
-                rivalAlertSpokenAt(LocalDateTime.now().minusDays(45)),
-                rivalAlertSpokenAt(LocalDateTime.now().minusDays(45)));
-        when(alertRepository.findByTerm_CategoryAndTranscriptLine_Meeting(TermCategory.COMPETITOR, meeting)).thenReturn(alerts);
+    void calculateChurnRisk_throwsWhenMeetingNotFound() {
+        when(meetingService.findById(99L)).thenThrow(new ResourceNotFoundException("Meeting not found: 99"));
 
-        assertEquals("Low", service.calculateChurnRisk(meeting));
+        assertThrows(ResourceNotFoundException.class, () -> service.calculateChurnRisk(99L));
     }
 
     @Test
     void generateMeetingSummary_aggregatesTranscriptLinesAlertsAndTermsByCategory() {
         Long meetingId = 1L;
+        when(meetingService.findById(meetingId)).thenReturn(Meeting.builder().id(meetingId).build());
 
         TranscriptLine line1 = TranscriptLine.builder().spokenAt(LocalDateTime.now()).build();
         TranscriptLine line2 = TranscriptLine.builder().spokenAt(LocalDateTime.now()).build();
-        when(transcriptLineRepository.findByMeeting_Id(meetingId)).thenReturn(List.of(line1, line2));
+        when(transcriptLineRepository.findByMeeting_IdOrderBySpokenAt(meetingId)).thenReturn(List.of(line1, line2));
 
-        DictionaryTerm rivalTerm = DictionaryTerm.builder().keyword("Concorrente X").category(TermCategory.COMPETITOR).build();
+        DictionaryTerm competitorTerm = DictionaryTerm.builder().keyword("Concorrente X").category(TermCategory.COMPETITOR).build();
         DictionaryTerm techTerm = DictionaryTerm.builder().keyword("Cloud").category(TermCategory.TECHNOLOGY).build();
         List<GeneratedAlert> alerts = List.of(
-                GeneratedAlert.builder().transcriptLine(line1).term(rivalTerm).confidenceScore(90).build(),
-                GeneratedAlert.builder().transcriptLine(line2).term(techTerm).confidenceScore(70).build());
+                GeneratedAlert.builder().transcriptLine(line1).term(competitorTerm).confidenceScore(90).build(),
+                GeneratedAlert.builder().transcriptLine(line2).term(competitorTerm).confidenceScore(90).build(),
+                GeneratedAlert.builder().transcriptLine(line2).term(techTerm).confidenceScore(60).build());
         when(alertRepository.findByTranscriptLine_Meeting_Id(meetingId)).thenReturn(alerts);
         when(alertService.calculateAverageConfidenceScore(meetingId)).thenReturn(80.0);
 
         MeetingSummaryDTO summary = service.generateMeetingSummary(meetingId);
 
-        assertEquals(2, summary.getTotalTranscriptLines());
-        assertEquals(2, summary.getTotalAlerts());
-        assertEquals(80.0, summary.getAverageConfidenceScore());
-        assertEquals(List.of("Concorrente X"), summary.getTermsByCategory().get(TermCategory.COMPETITOR));
-        assertEquals(List.of("Cloud"), summary.getTermsByCategory().get(TermCategory.TECHNOLOGY));
+        assertEquals(2, summary.totalTranscriptLines());
+        assertEquals(3, summary.totalAlerts());
+        assertEquals(80.0, summary.averageConfidenceScore());
+        assertEquals(List.of("Concorrente X"), summary.termsByCategory().get(TermCategory.COMPETITOR));
+        assertEquals(List.of("Cloud"), summary.termsByCategory().get(TermCategory.TECHNOLOGY));
+    }
+
+    @Test
+    void generateMeetingSummary_throwsWhenMeetingNotFound() {
+        when(meetingService.findById(99L)).thenThrow(new ResourceNotFoundException("Meeting not found: 99"));
+
+        assertThrows(ResourceNotFoundException.class, () -> service.generateMeetingSummary(99L));
     }
 }
