@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fiap.nous_sight.dto.DepartmentRequest;
 import br.com.fiap.nous_sight.entity.Department;
 import br.com.fiap.nous_sight.service.DepartmentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
+@Tag(name = "Departments", description = "Departments the participants belong to")
 @RequestMapping("/api/departments")
 public class DepartmentController {
 
@@ -28,27 +31,32 @@ public class DepartmentController {
         this.service = service;
     }
 
+    @Operation(summary = "List all departments")
     @GetMapping
     public List<Department> findAll() {
         return service.findAll();
     }
 
+    @Operation(summary = "Find a department by id")
     @GetMapping("/{id}")
     public Department findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
+    @Operation(summary = "Create a department", description = "The acronym must be unique (case-insensitive)")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Department create(@RequestBody @Valid DepartmentRequest request) {
         return service.create(request);
     }
 
+    @Operation(summary = "Update a department", description = "The acronym must be unique (case-insensitive)")
     @PutMapping("/{id}")
     public Department update(@PathVariable Long id, @RequestBody @Valid DepartmentRequest request) {
         return service.update(id, request);
     }
 
+    @Operation(summary = "Delete a department", description = "A department that has participants cannot be deleted")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {

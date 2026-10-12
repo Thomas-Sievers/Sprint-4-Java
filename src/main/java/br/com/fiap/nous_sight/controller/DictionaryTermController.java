@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fiap.nous_sight.dto.DictionaryTermRequest;
 import br.com.fiap.nous_sight.entity.DictionaryTerm;
 import br.com.fiap.nous_sight.service.DictionaryTermService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
+@Tag(name = "Dictionary terms", description = "Keywords monitored in the meetings (competitors, own products, technology)")
 @RequestMapping("/api/dictionary-terms")
 public class DictionaryTermController {
 
@@ -28,27 +31,32 @@ public class DictionaryTermController {
         this.service = service;
     }
 
+    @Operation(summary = "List all dictionary terms")
     @GetMapping
     public List<DictionaryTerm> findAll() {
         return service.findAll();
     }
 
+    @Operation(summary = "Find a dictionary term by id")
     @GetMapping("/{id}")
     public DictionaryTerm findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
+    @Operation(summary = "Create a dictionary term", description = "The keyword must be unique (case-insensitive)")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DictionaryTerm create(@RequestBody @Valid DictionaryTermRequest request) {
         return service.create(request);
     }
 
+    @Operation(summary = "Update a dictionary term", description = "The keyword must be unique (case-insensitive)")
     @PutMapping("/{id}")
     public DictionaryTerm update(@PathVariable Long id, @RequestBody @Valid DictionaryTermRequest request) {
         return service.update(id, request);
     }
 
+    @Operation(summary = "Delete a dictionary term", description = "A term that has alerts cannot be deleted")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
