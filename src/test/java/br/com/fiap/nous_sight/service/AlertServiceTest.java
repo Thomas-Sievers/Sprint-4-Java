@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import br.com.fiap.nous_sight.domain.ValidationStatus;
 import br.com.fiap.nous_sight.entity.GeneratedAlert;
 import br.com.fiap.nous_sight.repository.GeneratedAlertRepository;
 
@@ -47,32 +48,32 @@ class AlertServiceTest {
     }
 
     @Test
-    void registerHumanValidation_setsValidadoWhenConfirmed() {
-        GeneratedAlert alert = GeneratedAlert.builder().id(1L).validationStatus("Pendente").build();
+    void registerHumanValidation_setsValidatedWhenConfirmed() {
+        GeneratedAlert alert = GeneratedAlert.builder().id(1L).validationStatus(ValidationStatus.PENDING).build();
         when(repository.findById(1L)).thenReturn(Optional.of(alert));
         when(repository.save(any(GeneratedAlert.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         GeneratedAlert result = service.registerHumanValidation(1L, true, null);
 
-        assertEquals("Validado", result.getValidationStatus());
+        assertEquals(ValidationStatus.VALIDATED, result.getValidationStatus());
         verify(repository).save(alert);
     }
 
     @Test
-    void registerHumanValidation_setsCorrigidoWithNoteWhenNotConfirmed() {
-        GeneratedAlert alert = GeneratedAlert.builder().id(1L).validationStatus("Pendente").build();
+    void registerHumanValidation_setsCorrectedWithNoteWhenNotConfirmed() {
+        GeneratedAlert alert = GeneratedAlert.builder().id(1L).validationStatus(ValidationStatus.PENDING).build();
         when(repository.findById(1L)).thenReturn(Optional.of(alert));
         when(repository.save(any(GeneratedAlert.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         GeneratedAlert result = service.registerHumanValidation(1L, false, "Termo mal interpretado");
 
-        assertEquals("Corrigido", result.getValidationStatus());
+        assertEquals(ValidationStatus.CORRECTED, result.getValidationStatus());
         assertEquals("Termo mal interpretado", result.getNote());
     }
 
     @Test
     void registerHumanValidation_rejectsAlreadyValidatedAlert() {
-        GeneratedAlert alert = GeneratedAlert.builder().id(1L).validationStatus("Validado").build();
+        GeneratedAlert alert = GeneratedAlert.builder().id(1L).validationStatus(ValidationStatus.VALIDATED).build();
         when(repository.findById(1L)).thenReturn(Optional.of(alert));
 
         assertThrows(RuntimeException.class, () -> service.registerHumanValidation(1L, true, null));

@@ -1,12 +1,14 @@
 package br.com.fiap.nous_sight.entity;
 
+import br.com.fiap.nous_sight.domain.ParticipationType;
+import br.com.fiap.nous_sight.domain.ParticipationTypeConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,18 +29,20 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class MeetingParticipant {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private MeetingParticipantId id;
 
     @ManyToOne
-    @JoinColumn(name = "ID_REUNIAO", nullable = false)
+    @MapsId("meetingId")
+    @JoinColumn(name = "ID_REUNIAO")
     private Meeting meeting;
 
     @ManyToOne
-    @JoinColumn(name = "ID_PARTICIPANTE", nullable = false)
+    @MapsId("participantId")
+    @JoinColumn(name = "ID_PARTICIPANTE")
     private Participant participant;
 
-    @Column(name = "TIPO_PARTICIPACAO", nullable = false)
-    private String participationType;
+    @Convert(converter = ParticipationTypeConverter.class)
+    @Column(name = "TIPO_PARTICIPACAO", nullable = false, length = 20)
+    private ParticipationType participationType;
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +31,8 @@ import lombok.ToString;
 public class TranscriptLine {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqFalaTranscricao")
+    @SequenceGenerator(name = "seqFalaTranscricao", sequenceName = "SEQ_FALA_TRANSCRICAO", allocationSize = 1)
     @Column(name = "ID_TRANSCRICAO")
     private Long id;
 

@@ -1,10 +1,14 @@
 package br.com.fiap.nous_sight.entity;
 
+import br.com.fiap.nous_sight.domain.TermCategory;
+import br.com.fiap.nous_sight.domain.TermCategoryConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,13 +30,15 @@ import lombok.ToString;
 public class DictionaryTerm {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqDicionarioTermos")
+    @SequenceGenerator(name = "seqDicionarioTermos", sequenceName = "SEQ_DICIONARIO_TERMOS", allocationSize = 1)
     @Column(name = "ID_TERMO")
     private Long id;
 
-    @Column(name = "PALAVRA_CHAVE", nullable = false, unique = true)
+    @Column(name = "PALAVRA_CHAVE", nullable = false, unique = true, length = 50)
     private String keyword;
 
-    @Column(name = "CATEGORIA", nullable = false)
-    private String category;
+    @Convert(converter = TermCategoryConverter.class)
+    @Column(name = "CATEGORIA", nullable = false, length = 30)
+    private TermCategory category;
 }

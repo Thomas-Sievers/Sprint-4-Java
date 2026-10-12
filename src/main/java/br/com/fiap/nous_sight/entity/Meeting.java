@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,16 +29,17 @@ import lombok.ToString;
 public class Meeting {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seqReuniao")
+    @SequenceGenerator(name = "seqReuniao", sequenceName = "SEQ_REUNIAO", allocationSize = 1)
     @Column(name = "ID_REUNIAO")
     private Long id;
 
-    @Column(name = "TITULO", nullable = false)
+    @Column(name = "TITULO", nullable = false, length = 100)
     private String title;
 
     @Column(name = "DATA_HORA_INICIO", nullable = false)
     private LocalDateTime startDateTime;
 
     @Column(name = "DATA_HORA_FIM")
-    private LocalDateTime endDateTime;
+    private LocalDateTime endDateTime; // optional; if present, must be >= startDateTime
 }

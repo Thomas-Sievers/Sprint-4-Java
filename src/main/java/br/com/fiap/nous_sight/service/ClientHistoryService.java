@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import br.com.fiap.nous_sight.domain.TermCategory;
 import br.com.fiap.nous_sight.dto.MeetingSummaryDTO;
 import br.com.fiap.nous_sight.entity.GeneratedAlert;
 import br.com.fiap.nous_sight.entity.Meeting;
@@ -17,7 +18,6 @@ import br.com.fiap.nous_sight.repository.TranscriptLineRepository;
 @Service
 public class ClientHistoryService {
 
-    private static final String CATEGORY_TIME_RIVAL = "Time Rival";
     private static final int CHURN_RISK_WINDOW_DAYS = 30;
 
     private final GeneratedAlertRepository alertRepository;
@@ -36,7 +36,7 @@ public class ClientHistoryService {
         LocalDateTime windowStart = LocalDateTime.now().minusDays(CHURN_RISK_WINDOW_DAYS);
 
         long rivalMentionCount = alertRepository
-                .findByTerm_CategoryAndTranscriptLine_Meeting(CATEGORY_TIME_RIVAL, meeting)
+                .findByTerm_CategoryAndTranscriptLine_Meeting(TermCategory.COMPETITOR, meeting)
                 .stream()
                 .filter(alert -> alert.getTranscriptLine().getSpokenAt().isAfter(windowStart))
                 .count();
@@ -54,7 +54,7 @@ public class ClientHistoryService {
         List<TranscriptLine> transcriptLines = transcriptLineRepository.findByMeeting_Id(meetingId);
         List<GeneratedAlert> alerts = alertRepository.findByTranscriptLine_Meeting_Id(meetingId);
 
-        Map<String, List<String>> termsByCategory = alerts.stream()
+        Map<TermCategory, List<String>> termsByCategory = alerts.stream()
                 .collect(Collectors.groupingBy(
                         alert -> alert.getTerm().getCategory(),
                         Collectors.mapping(alert -> alert.getTerm().getKeyword(), Collectors.toList())));

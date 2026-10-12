@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import br.com.fiap.nous_sight.domain.ValidationStatus;
 import br.com.fiap.nous_sight.entity.GeneratedAlert;
 import br.com.fiap.nous_sight.repository.GeneratedAlertRepository;
 
@@ -11,11 +12,6 @@ import br.com.fiap.nous_sight.repository.GeneratedAlertRepository;
 public class AlertService {
 
     private static final int CONFIDENCE_THRESHOLD = 80;
-
-    // stored values: "Pendente" | "Validado" | "Corrigido"
-    private static final String STATUS_PENDENTE = "Pendente";
-    private static final String STATUS_VALIDADO = "Validado";
-    private static final String STATUS_CORRIGIDO = "Corrigido";
 
     private final GeneratedAlertRepository repository;
 
@@ -34,9 +30,9 @@ public class AlertService {
         validate(alert);
 
         if (confirmed) {
-            alert.setValidationStatus(STATUS_VALIDADO);
+            alert.setValidationStatus(ValidationStatus.VALIDATED);
         } else {
-            alert.setValidationStatus(STATUS_CORRIGIDO);
+            alert.setValidationStatus(ValidationStatus.CORRECTED);
             alert.setNote(correctedNote);
         }
 
@@ -89,7 +85,7 @@ public class AlertService {
     }
 
     private void validateNotAlreadyValidated(GeneratedAlert alert) {
-        if (!STATUS_PENDENTE.equals(alert.getValidationStatus())) {
+        if (alert.getValidationStatus() != ValidationStatus.PENDING) {
             throw new RuntimeException("Alert has already been validated: " + alert.getId());
         }
     }
