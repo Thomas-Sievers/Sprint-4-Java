@@ -6,8 +6,7 @@ dashboard and the registrations (CRUD).
 
 It started from a teammate's front-end written for a different back-end:
 only its visual identity (styles, theme, shell and small components) was
-kept, and every screen was rewritten for this API. The plan and decisions
-are in [`../Docs/FRONTEND_IMPLEMENTATION_PLAN.md`](../Docs/FRONTEND_IMPLEMENTATION_PLAN.md).
+kept, and every screen was rewritten for this API.
 
 ## Stack
 

@@ -100,9 +100,7 @@ npm run dev
 Log in with `aluno` / `123456`. Screens: login, dashboard, meetings,
 meeting detail, new meeting (transcript analysis), human validation queue,
 registrations (CRUD) and settings. See [`frontend/README.md`](frontend/README.md)
-for details, [`Docs/screenshots/`](Docs/screenshots/) for the screenshots
-and [`Docs/FRONTEND_IMPLEMENTATION_PLAN.md`](Docs/FRONTEND_IMPLEMENTATION_PLAN.md)
-for the implementation plan.
+for details and [`Docs/screenshots/`](Docs/screenshots/) for the screenshots.
 
 ## Running against Oracle (delivery)
 
