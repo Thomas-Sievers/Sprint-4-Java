@@ -182,6 +182,14 @@ Rewrite `NovaReuniaoPage` as one page with three steps:
 API 422 messages (e.g. speaker not linked, time outside the meeting) are
 shown next to the form. Remove all audio/bot/device/Synd code.
 
+Implementation notes: the meeting is created on one date with start/end
+times; participants are linked one `POST` at a time (organizer first), so a
+422 names who failed and the ones already linked stay locked; the form also
+blocks a second Organizador and checks times before sending. The example
+fills 4 lines (SAP twice, Salesforce, CRM, Protheus, ERP, Concorrente X) →
+7 alerts, 4 pending, churn **High**. Shared form pieces: `lib/ui.ts`
+(input/button classes) and `components/Form.tsx` (`Field`, `FormBanner`).
+
 **Commit:** `feat: new meeting flow with transcript analysis`
 
 ## Phase 4 — Human validation queue
