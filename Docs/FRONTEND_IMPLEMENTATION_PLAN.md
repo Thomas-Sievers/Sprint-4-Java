@@ -199,8 +199,10 @@ fills 4 lines (SAP twice, Salesforce, CRM, Protheus, ERP, Concorrente X) →
   term + category, score;
 - **Confirmar** → `POST /api/alerts/{id}/validate` `{confirmed: true}`;
 - **Corrigir** → textarea → `{confirmed: false, correctedNote}` (required);
-- the card leaves the list on success; 422 (already reviewed) shows the
-  message. Extract the card into a component reused by Phase 2.
+- the card leaves the list on success (with a short "confirmado /
+  corrigido" note); 422 (already reviewed) shows the message on the card.
+  The card is `components/AlertCard.tsx` (built in Phase 2, here with
+  `showMeeting` to link to the meeting). Oldest mention first.
 
 **Commit:** `feat: human validation queue`
 

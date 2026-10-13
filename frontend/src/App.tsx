@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
 import { AuthLayout } from "./components/AuthLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { InsightsPage } from "./pages/InsightsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MeetingDetailPage } from "./pages/MeetingDetailPage";
 import { MeetingsPage } from "./pages/MeetingsPage";
@@ -26,7 +27,7 @@ export function App() {
         <Route path="/reunioes" element={<MeetingsPage />} />
         <Route path="/reunioes/nova" element={<NovaReuniaoPage />} />
         <Route path="/reunioes/:reuniaoId" element={<MeetingDetailPage />} />
-        <Route path="/validacao" element={<PlaceholderPage titulo="Validação" />} />
+        <Route path="/validacao" element={<InsightsPage />} />
         <Route path="/cadastros" element={<PlaceholderPage titulo="Cadastros" />} />
         <Route path="/configuracoes" element={<PlaceholderPage titulo="Configurações" />} />
       </Route>

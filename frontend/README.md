@@ -58,6 +58,7 @@ the token (`base64(username:password)`) and the username are saved in
 | `/reunioes` | Meetings, newest first, with churn badge | `GET /api/meetings`, `GET /api/meetings/{id}/churn-risk` per meeting |
 | `/reunioes/nova` | New meeting in 3 steps (meeting → participants → transcript) + analysis result; "Preencher exemplo" fills a demo transcript | `GET /api/participants`, `POST /api/meetings`, `POST /api/meetings/{id}/participants`, `POST /api/meetings/{id}/transcript` |
 | `/reunioes/:id` | Meeting detail: summary, participants, transcript (lines with alerts highlighted), alerts with Confirmar / Corrigir | `GET /api/meetings/{id}` + `/participants`, `/transcript-lines`, `/alerts`, `/summary`, `/churn-risk`; `POST /api/alerts/{id}/validate` |
+| `/validacao` | Human validation queue: Confirmar → `VALIDATED`, Corrigir + note → `CORRECTED` | `GET /api/alerts/pending`, `POST /api/alerts/{id}/validate` |
 
 ## Structure
 
