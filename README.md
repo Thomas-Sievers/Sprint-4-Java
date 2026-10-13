@@ -30,6 +30,7 @@ meetings where the client is talking about competitors.
   (`POST /api/alerts/{id}/validate`).
 - **Meeting summary** and **churn risk** per meeting.
 - Swagger UI, HTTP Basic login and CORS for the front-end.
+- React front-end in [`frontend/`](frontend/README.md) that uses this API.
 
 ## Architecture
 
@@ -79,6 +80,23 @@ Run the tests:
 
 > Use `./mvnw` instead of a system `mvn` that runs on a JDK newer than 21:
 > Mockito can't mock classes on JDK 26.
+
+## Front-end
+
+The web interface is in [`frontend/`](frontend/README.md) (React 19 + Vite +
+TypeScript + Tailwind). It runs on `http://localhost:5500`, the origin the
+API's CORS allows. Start the API first, then:
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+See [`frontend/README.md`](frontend/README.md) for details and
+[`Docs/FRONTEND_IMPLEMENTATION_PLAN.md`](Docs/FRONTEND_IMPLEMENTATION_PLAN.md)
+for the implementation plan.
 
 ## Running against Oracle (delivery)
 

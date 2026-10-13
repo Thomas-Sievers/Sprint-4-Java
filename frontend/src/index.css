@@ -1,0 +1,284 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  /* Surfaces */
+  --color-sidebar: #0d1117;
+  --color-surface: #12161d;
+  --color-card: #1b212b;
+
+  /* Accent */
+  --color-accent: #22d3e5;
+  --color-accent-2: #7c6ff0;
+  --color-accent-ink: #0f1319;
+  /* Cor pra texto/icone accent-colorido sobre fundo de card/surface (nao um fill solido).
+     No escuro e igual a --color-accent; no claro fica mais escura pra manter contraste
+     sobre fundo branco (ver :root[data-theme="light"] abaixo). */
+  --color-accent-text: #22d3e5;
+
+  /* Text */
+  --color-ink: #f5f7fa;
+  --color-muted: #8b96a8;
+  --color-faint: #7c8698;
+  --color-dim: #6b7688;
+  --color-chevron: #5b6577;
+
+  /* Tom neutro usado em bordas, divisores e preenchimentos sutis (era "white" hardcoded
+     nas classes bg-white/N e border-white/N). No escuro continua branco (clareia o fundo
+     escuro); no claro vira um tom escuro (escurece o fundo claro), preservando as mesmas
+     opacidades ja usadas em todo o app. */
+  --color-hairline: #ffffff;
+
+  /* Status - cor "base" usada em preenchimentos translucidos (bg-danger/8 etc) que
+     continuam iguais nos dois temas */
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+  --color-success: #4ade80;
+
+  /* Pares solidos (fundo pastel + texto saturado) usados em badges/chips/icones de
+     status - no escuro reproduzem o visual translucido de hoje (bg a 14% + cor cheia). */
+  --color-danger-bg: rgba(248, 113, 113, 0.14);
+  --color-danger-text: #f87171;
+  --color-warning-bg: rgba(251, 191, 36, 0.14);
+  --color-warning-text: #fbbf24;
+  --color-success-bg: rgba(74, 222, 128, 0.14);
+  --color-success-text: #4ade80;
+
+  --animate-fade-up: fade-up 0.4s ease-out both;
+  --animate-count-fade: count-fade 0.3s ease-out both;
+
+  --animate-blob-a: blob-float-a 24s ease-in-out infinite;
+  --animate-blob-b: blob-float-b 33s ease-in-out infinite;
+  --animate-blob-c: blob-float-c 19s ease-in-out infinite;
+  --animate-blob-d: blob-float-d 29s ease-in-out infinite;
+
+  --animate-orbit-cw: brand-orbit-cw 4s linear infinite;
+  --animate-orbit-ccw: brand-orbit-ccw 6s linear infinite;
+}
+
+/* Tema claro: troca de tema e so isso - redefine os tokens acima, cada classe Tailwind que
+   ja usa var(--color-*) internamente resolve pro novo valor automaticamente. Ver lib/theme.ts
+   pra como/quando o atributo data-theme e aplicado no <html>. */
+:root[data-theme="light"] {
+  --color-sidebar: #ffffff;
+  --color-surface: #f5f3ef;
+  --color-card: #ffffff;
+
+  --color-accent-text: #0e8a96;
+
+  --color-ink: #16202b;
+  --color-muted: #64748a;
+  --color-faint: #7c8698;
+  --color-dim: #94a3b8;
+  --color-chevron: #b5bec9;
+
+  --color-hairline: #102030;
+
+  --color-danger-bg: #fdecea;
+  --color-danger-text: #c1401e;
+  --color-warning-bg: #fdf3df;
+  --color-warning-text: #b7791f;
+  --color-success-bg: #e8f7ee;
+  --color-success-text: #1a7f4c;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes count-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blob-float-a {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(65px, -45px) scale(1.08);
+  }
+  50% {
+    transform: translate(20px, 55px) scale(0.92);
+  }
+  75% {
+    transform: translate(-55px, 15px) scale(1.05);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes blob-float-b {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  30% {
+    transform: translate(-70px, 30px) scale(0.9);
+  }
+  60% {
+    transform: translate(-25px, -60px) scale(1.1);
+  }
+  85% {
+    transform: translate(40px, -10px) scale(0.96);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes blob-float-c {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(45px, 40px) scale(1.06);
+  }
+  55% {
+    transform: translate(-40px, 60px) scale(0.94);
+  }
+  80% {
+    transform: translate(-60px, -20px) scale(1.04);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes blob-float-d {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  35% {
+    transform: translate(-50px, -55px) scale(1.1);
+  }
+  65% {
+    transform: translate(60px, -15px) scale(0.9);
+  }
+  90% {
+    transform: translate(30px, 50px) scale(1.03);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-surface text-ink antialiased;
+}
+
+* {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.fluid-blob {
+  position: absolute;
+  border-radius: 9999px;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fluid-blob {
+    animation: none !important;
+  }
+}
+
+/* Brand loader: two blurred shapes orbiting the center via a rotating,
+   zero-size wrapper offset from the shape itself. */
+@keyframes brand-orbit-cw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes brand-orbit-ccw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.brand-loader-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+
+.brand-loader-blob {
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-loader-orbit {
+    animation: none !important;
+  }
+}
+
+/* Route transitions (View Transitions API, triggered by React Router's
+   `viewTransition` prop/option) */
+::view-transition-old(root) {
+  animation: view-transition-fade-out 200ms ease-out both;
+}
+
+::view-transition-new(root) {
+  animation: view-transition-fade-in 220ms ease-out both;
+}
+
+@keyframes view-transition-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes view-transition-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
