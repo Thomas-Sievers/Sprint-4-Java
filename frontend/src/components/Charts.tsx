@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { usePrefersReducedMotion } from "../lib/usePrefersReducedMotion";
 
 // Bar charts with the old dashboard's look: theme tokens for every color,
@@ -83,11 +83,11 @@ export function HBarChart({
             maxBarSize={20}
             isAnimationActive={!reducedMotion}
             animationDuration={300}
-            label={{ position: "right", fill: "var(--color-muted)", fontSize: 12 }}
           >
             {data.map((d) => (
               <Cell key={d.key} fill={d.color ?? color} />
             ))}
+            <LabelList dataKey="value" position="right" fill="var(--color-muted)" fontSize={12} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>

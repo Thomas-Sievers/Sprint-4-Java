@@ -264,15 +264,24 @@ The dashboard is lazy-loaded so Recharts is a separate chunk.
 4. Take screenshots of each screen for the Java PDF ("prints das telas
    implementadas").
 
+Result of the final check: no reference left from the list above;
+`npm run build` and `npm run lint` clean. The manual path was run in
+headless Chrome against the real API (wrong and right login, dashboard,
+meetings, detail, 404, new meeting with the example → 7 alerts / 4 pending
+/ High, confirm and correct in the queue, department create/edit/delete,
+422 duplicate and 422 "has participants", participant e-mail check, light
+theme, 401 with a stale token → `/login`) with no console errors. The
+screenshots are in `Docs/screenshots/`.
+
 **Commit:** `docs: front-end readme and final check`
 
 ## Definition of Done
 
-- [ ] No Firebase, Google AI or old-API code left; app runs on port 5500.
-- [ ] Login with `aluno` / `123456` against the real API.
-- [ ] Dashboard, meetings, meeting detail, new meeting (analysis), validation queue and CRUD screens all use the Sprint 4 API.
-- [ ] API errors (400/401/404/422) shown as friendly messages.
-- [ ] `npm run build` and `npm run lint` pass; screenshots ready for the PDF.
+- [x] No Firebase, Google AI or old-API code left; app runs on port 5500.
+- [x] Login with `aluno` / `123456` against the real API.
+- [x] Dashboard, meetings, meeting detail, new meeting (analysis), validation queue and CRUD screens all use the Sprint 4 API.
+- [x] API errors (400/401/404/422) shown as friendly messages.
+- [x] `npm run build` and `npm run lint` pass; screenshots ready for the PDF.
 
 ## Decisions
 
