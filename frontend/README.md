@@ -50,13 +50,21 @@ the token (`base64(username:password)`) and the username are saved in
 `localStorage` and sent as `Authorization: Basic <token>` on every request
 (`src/lib/api.ts`). Any later 401 logs out and goes back to `/login`.
 
+## Screens
+
+| Route | Screen | API calls |
+|---|---|---|
+| `/login` | Login (HTTP Basic) | `GET /api/meetings` |
+| `/reunioes` | Meetings, newest first, with churn badge | `GET /api/meetings`, `GET /api/meetings/{id}/churn-risk` per meeting |
+| `/reunioes/:id` | Meeting detail: summary, participants, transcript (lines with alerts highlighted), alerts with Confirmar / Corrigir | `GET /api/meetings/{id}` + `/participants`, `/transcript-lines`, `/alerts`, `/summary`, `/churn-risk`; `POST /api/alerts/{id}/validate` |
+
 ## Structure
 
 ```
 src/
-├── components/   Shell, layout and small UI components (Badge, StatCard, ...)
-├── context/      AuthContext (Basic auth session and theme)
-├── lib/          api.ts (one function per endpoint), labels.ts (enum labels), theme, view transitions
+├── components/   Shell, layout and UI components (AlertCard, ChurnBadge, TermTag, States, ...)
+├── context/      AuthContext + useAuth (Basic auth session and theme)
+├── lib/          api.ts (one function per endpoint), labels.ts (enum labels), format.ts, churn.ts, theme
 ├── pages/        One file per screen
 └── types/        api.ts — the API's entities, requests and error body
 ```

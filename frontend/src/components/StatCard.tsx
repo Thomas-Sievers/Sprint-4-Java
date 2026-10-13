@@ -10,7 +10,7 @@ function useCountUp(target: number, durationMs = 700): number {
     function tick(now: number) {
       const progress = Math.min(1, (now - start) / durationMs);
       const eased = 1 - (1 - progress) ** 3;
-      setValue(Math.round(eased * target));
+      setValue(eased * target);
       if (progress < 1) {
         frameRef.current = requestAnimationFrame(tick);
       }
@@ -30,11 +30,14 @@ export function StatCard({
   value,
   tone = "default",
   delayMs = 0,
+  format = (n) => String(Math.round(n)),
 }: {
   label: string;
   value: number;
   tone?: "default" | "danger";
   delayMs?: number;
+  /** Formats the animated value (integer by default). */
+  format?: (value: number) => string;
 }) {
   const displayValue = useCountUp(value);
 
@@ -44,7 +47,7 @@ export function StatCard({
       style={{ animationDelay: `${delayMs}ms` }}
     >
       <p className={`text-2xl font-extrabold ${tone === "danger" ? "text-danger-text" : "text-ink"}`}>
-        {displayValue}
+        {format(displayValue)}
       </p>
       <p className="mt-1 text-sm text-muted">{label}</p>
     </div>

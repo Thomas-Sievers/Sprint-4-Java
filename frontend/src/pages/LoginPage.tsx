@@ -2,7 +2,7 @@ import { Info, WarningCircle } from "@phosphor-icons/react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { BrandLoader } from "../components/BrandLoader";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { ApiError, checkCredentials, encodeBasicToken } from "../lib/api";
 import { withViewTransition } from "../lib/viewTransition";
 

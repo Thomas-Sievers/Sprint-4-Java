@@ -154,9 +154,14 @@ identifiers may keep their current names.
      lines that generated alerts;
    - alerts ("Insights"): term + category tag, **evidence** (`note`),
      speaker, score with band color, status badge; pending alerts show the
-     same "Confirmar / Corrigir" actions as the validation queue (Phase 4
-     component).
+     same "Confirmar / Corrigir" actions as the validation queue. The card
+     is built here as `components/AlertCard.tsx` and reused by Phase 4.
    - 404 → existing "não encontrada" state.
+3. Shared pieces created in this phase: `lib/format.ts` (dates, duration,
+   score), `lib/churn.ts` (churn risk of many meetings in parallel),
+   `lib/errors.ts`, `components/States.tsx` (error/empty/skeleton/header),
+   `ChurnBadge`, `TermTag` (category chip), `ScoreConfianca`.
+   `useAuth` moved to `context/useAuth.ts` so lint has no warnings.
 
 **Commit:** `feat: meetings list and meeting detail on the new api`
 

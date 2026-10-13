@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -11,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { setAuthToken, setUnauthorizedHandler } from "../lib/api";
 import { definirTema, lerTemaSalvo } from "../lib/theme";
 import type { Tema } from "../types/api";
+import { AuthContext, type AuthContextValue } from "./useAuth";
 
 const TOKEN_KEY = "noussight.token";
 const USERNAME_KEY = "noussight.usuario";
@@ -19,19 +18,6 @@ interface Session {
   token: string;
   username: string;
 }
-
-interface AuthContextValue {
-  token: string | null;
-  username: string | null;
-  isAuthenticated: boolean;
-  /** Saves the HTTP Basic token (base64 of "username:password") after the API accepted it. */
-  login: (username: string, token: string) => void;
-  logout: () => void;
-  tema: Tema;
-  setTema: (tema: Tema) => void;
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function readStoredSession(): Session | null {
   try {
@@ -103,12 +89,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth precisa ser usado dentro de um AuthProvider");
-  }
-  return ctx;
 }

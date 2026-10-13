@@ -9,7 +9,7 @@ import {
 } from "@phosphor-icons/react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import { createTransitionClickHandler, withViewTransition } from "../lib/viewTransition";
 import { Avatar } from "./Avatar";
 import { FluidBackground } from "./FluidBackground";
