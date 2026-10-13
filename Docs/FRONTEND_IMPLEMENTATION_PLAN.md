@@ -237,8 +237,15 @@ The dashboard is lazy-loaded so Recharts is a separate chunk.
    Each tab: table + create/edit form + delete with confirmation; API 400
    field errors under the fields, 422 messages (duplicate, "has
    participants", etc.) in a banner. This shows the full CRUD working.
+   The three tabs share one generic component, `components/CrudSection.tsx`
+   (config per resource: columns, form fields, client checks, API calls);
+   the active tab is in the URL (`/cadastros?aba=participantes`).
 2. **`ConfiguracoesPage`**: keep only tema (claro/escuro) and leitura
    facilitada, both in localStorage; remove photo upload and the API calls.
+   In the old app "leitura facilitada" showed AI-written short summaries,
+   which this API does not have; here it enlarges the text (~12%) and the
+   line spacing (`html[data-leitura="facilitada"]` in `index.css`), applied
+   before the first paint like the theme.
 
 **Commit:** `feat: crud registrations and local settings`
 

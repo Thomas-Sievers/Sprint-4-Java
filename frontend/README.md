@@ -60,14 +60,16 @@ the token (`base64(username:password)`) and the username are saved in
 | `/reunioes/nova` | New meeting in 3 steps (meeting → participants → transcript) + analysis result; "Preencher exemplo" fills a demo transcript | `GET /api/participants`, `POST /api/meetings`, `POST /api/meetings/{id}/participants`, `POST /api/meetings/{id}/transcript` |
 | `/reunioes/:id` | Meeting detail: summary, participants, transcript (lines with alerts highlighted), alerts with Confirmar / Corrigir | `GET /api/meetings/{id}` + `/participants`, `/transcript-lines`, `/alerts`, `/summary`, `/churn-risk`; `POST /api/alerts/{id}/validate` |
 | `/validacao` | Human validation queue: Confirmar → `VALIDATED`, Corrigir + note → `CORRECTED` | `GET /api/alerts/pending`, `POST /api/alerts/{id}/validate` |
+| `/cadastros` | CRUD in 3 tabs: Departamentos, Participantes, Dicionário de termos (400 errors under the fields, 422 in a banner) | `GET/POST/PUT/DELETE /api/departments`, `/api/participants`, `/api/dictionary-terms` |
+| `/configuracoes` | Theme (dark/light) and "leitura facilitada" (larger text), saved in `localStorage` | — |
 
 ## Structure
 
 ```
 src/
-├── components/   Shell, layout and UI components (AlertCard, ChurnBadge, TermTag, States, ...)
+├── components/   Shell, layout and UI components (AlertCard, CrudSection, Charts, ChurnBadge, TermTag, Form, States, ...)
 ├── context/      AuthContext + useAuth (Basic auth session and theme)
-├── lib/          api.ts (one function per endpoint), labels.ts (enum labels), format.ts, churn.ts, dashboard.ts (aggregations), theme
+├── lib/          api.ts (one function per endpoint), labels.ts (enum labels), format.ts, churn.ts, dashboard.ts (aggregations), ui.ts (form classes), theme
 ├── pages/        One file per screen
 └── types/        api.ts — the API's entities, requests and error body
 ```

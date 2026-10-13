@@ -187,6 +187,16 @@ body {
   @apply bg-surface text-ink antialiased;
 }
 
+/* Leitura facilitada (Configurações): every rem-based size grows ~12%, with looser lines. */
+html[data-leitura="facilitada"] {
+  font-size: 112.5%;
+}
+
+html[data-leitura="facilitada"] body {
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
 * {
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
