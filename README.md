@@ -64,7 +64,10 @@ from the `SEQ_<TABLE>` sequences.
 ./mvnw spring-boot:run
 ```
 
-- In-memory H2 database in Oracle mode (`jdbc:h2:mem:noussight;MODE=Oracle`).
+- In-memory H2 database in Oracle mode (`jdbc:h2:mem:noussight;MODE=Oracle;DB_CLOSE_DELAY=-1`).
+  `DB_CLOSE_DELAY=-1` keeps the database alive while the API runs, even if
+  every pool connection closes at the same moment (without it H2 deletes the
+  in-memory database and the next connection gets an empty one).
   Hibernate creates the tables and sequences from the entities, then
   `src/main/resources/data.sql` loads the sample data. That file is Part 2
   (DML) of `sprint4.sql`: 5 departments, 10 participants, 10 meetings,
