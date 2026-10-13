@@ -2,19 +2,30 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { useNavigate } from "react-router-dom";
+import { setAuthToken, setUnauthorizedHandler } from "../lib/api";
 import { definirTema, lerTemaSalvo } from "../lib/theme";
 import type { Tema } from "../types/api";
 
-const STORAGE_KEY = "noussight.token";
+const TOKEN_KEY = "noussight.token";
+const USERNAME_KEY = "noussight.usuario";
+
+interface Session {
+  token: string;
+  username: string;
+}
 
 interface AuthContextValue {
   token: string | null;
+  username: string | null;
   isAuthenticated: boolean;
-  setToken: (token: string) => void;
+  /** Saves the HTTP Basic token (base64 of "username:password") after the API accepted it. */
+  login: (username: string, token: string) => void;
   logout: () => void;
   tema: Tema;
   setTema: (tema: Tema) => void;
@@ -22,35 +33,56 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-function readStoredToken(): string | null {
+function readStoredSession(): Session | null {
   try {
-    return window.localStorage.getItem(STORAGE_KEY);
+    const token = window.localStorage.getItem(TOKEN_KEY);
+    const username = window.localStorage.getItem(USERNAME_KEY);
+    return token && username ? { token, username } : null;
   } catch {
     return null;
   }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setTokenState] = useState<string | null>(() => readStoredToken());
+  const navigate = useNavigate();
+  const [session, setSession] = useState<Session | null>(() => {
+    const stored = readStoredSession();
+    // Set before the first render so the first requests already carry the header.
+    setAuthToken(stored?.token ?? null);
+    return stored;
+  });
   const [tema, setTemaState] = useState<Tema>(() => lerTemaSalvo());
 
-  const setToken = useCallback((next: string) => {
-    setTokenState(next);
+  const login = useCallback((username: string, token: string) => {
+    setAuthToken(token);
+    setSession({ token, username });
     try {
-      window.localStorage.setItem(STORAGE_KEY, next);
+      window.localStorage.setItem(TOKEN_KEY, token);
+      window.localStorage.setItem(USERNAME_KEY, username);
     } catch {
       // localStorage indisponivel (modo privado, etc.) - sessao segue apenas em memoria
     }
   }, []);
 
   const logout = useCallback(() => {
-    setTokenState(null);
+    setAuthToken(null);
+    setSession(null);
     try {
-      window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(TOKEN_KEY);
+      window.localStorage.removeItem(USERNAME_KEY);
     } catch {
       // ignora
     }
   }, []);
+
+  // Any 401 on a later request means the saved credentials stopped working.
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      logout();
+      navigate("/login", { replace: true });
+    });
+    return () => setUnauthorizedHandler(null);
+  }, [logout, navigate]);
 
   const setTema = useCallback((novoTema: Tema) => {
     setTemaState(novoTema);
@@ -59,14 +91,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      token,
-      isAuthenticated: token !== null,
-      setToken,
+      token: session?.token ?? null,
+      username: session?.username ?? null,
+      isAuthenticated: session !== null,
+      login,
       logout,
       tema,
       setTema,
     }),
-    [token, setToken, logout, tema, setTema],
+    [session, login, logout, tema, setTema],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

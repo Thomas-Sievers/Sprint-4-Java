@@ -130,8 +130,11 @@ identifiers may keep their current names.
    in localStorage plus the username; remove the profile fetch. `LoginPage`
    asks for **usuário** and senha, calls `GET /api/meetings` with the
    header; 200 → save and redirect, 401 → "Usuário ou senha inválidos".
-   Remove the "criar conta" link. `token.ts` → read the username from the
-   context (no JWT). Any 401 later → `logout()` and go to `/login`.
+   Remove the "criar conta" link. No `token.ts`: the username is stored in
+   the context (no JWT). Any 401 later → `logout()` and go to `/login`.
+   Every request also sends `X-Requested-With: XMLHttpRequest`, so Spring
+   Security answers 401 without `WWW-Authenticate` and the browser does not
+   open its own Basic login dialog.
 5. Show a hint on the login page: "Usuário de teste: aluno / 123456".
 
 **Commit:** `feat: api client and basic auth for the sprint 4 api`

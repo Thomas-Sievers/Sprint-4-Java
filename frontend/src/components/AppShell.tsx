@@ -91,10 +91,10 @@ function SidebarNav() {
 }
 
 export function AppShell() {
-  const { logout } = useAuth();
+  const { username, logout } = useAuth();
   const navigate = useNavigate();
 
-  const displayName = "Usuário";
+  const displayName = username ?? "Usuário";
   const initials = displayName.slice(0, 2).toUpperCase();
 
   function handleLogout() {

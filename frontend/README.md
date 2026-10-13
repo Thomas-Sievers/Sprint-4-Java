@@ -36,13 +36,27 @@ CORS only allows `http://localhost:5500` and `http://127.0.0.1:5500`.
 | `npm run lint` | oxlint |
 | `npm run preview` | Serve the build on port 5500 |
 
+## Login
+
+The API uses **HTTP Basic** with in-memory users, so there is no sign-up:
+
+| User | Password |
+|---|---|
+| `aluno` | `123456` |
+| `admin` | `admin123` |
+
+The login page checks the credentials with `GET /api/meetings`. On success
+the token (`base64(username:password)`) and the username are saved in
+`localStorage` and sent as `Authorization: Basic <token>` on every request
+(`src/lib/api.ts`). Any later 401 logs out and goes back to `/login`.
+
 ## Structure
 
 ```
 src/
 ├── components/   Shell, layout and small UI components (Badge, StatCard, ...)
-├── context/      AuthContext (session and theme)
-├── lib/          Theme, view transitions and other helpers
+├── context/      AuthContext (Basic auth session and theme)
+├── lib/          api.ts (one function per endpoint), labels.ts (enum labels), theme, view transitions
 ├── pages/        One file per screen
-└── types/        TypeScript types
+└── types/        api.ts — the API's entities, requests and error body
 ```
