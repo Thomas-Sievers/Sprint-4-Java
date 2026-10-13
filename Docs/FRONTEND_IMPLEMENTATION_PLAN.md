@@ -218,6 +218,14 @@ No new back-end endpoint: compute everything from `meetings`, `alerts`,
 - "Reuniões em atenção": meetings with High risk, linking to the detail.
 - Remove the charts with no data source ("tendência de comunicação").
 
+Implementation notes: the aggregations are plain functions in
+`lib/dashboard.ts`; the charts are two reusable components in
+`components/Charts.tsx` (`HBarChart`, `VBarChart`) with the old styles.
+Status colors only appear on status-like categories (churn, validation
+status, confidence band), always next to a text label. "Reuniões por semana"
+shows up to 8 weeks ending at the latest meeting, with empty weeks included.
+The dashboard is lazy-loaded so Recharts is a separate chunk.
+
 **Commit:** `feat: dashboard from api data`
 
 ## Phase 6 — Registrations (CRUD) and settings
